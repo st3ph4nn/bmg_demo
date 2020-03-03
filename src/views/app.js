@@ -14,7 +14,8 @@ class Accounts extends LitElement {
   static get properties() {
     return {
       accounts: { type: Array },
-      toAccount: String
+      balance: Number,
+      toAccount: String,
     };
   }
 
@@ -25,22 +26,7 @@ class Accounts extends LitElement {
     this.toAmount = 0;
 
     this.accounts = [...this.accounts, account];
-  }
-
-  getAccount(IBAN) {
-    this.accounts.forEach(element => {
-      if (element.IBAN == IBAN) {
-        return element;
-      }
-    });
-  }
-
-  setAccount(account) {
-    this.accounts.forEach(element => {
-      if (element.IBAN == account.IBAN) {
-        element = account;
-      }
-    });
+    this.balance = account.balance;
   }
 
   setToAccount(value) {
@@ -49,6 +35,7 @@ class Accounts extends LitElement {
 
   setAmount(value) {
     this.toAmount = value;
+    console.log('amount value after', this.toAmount);
   }
 
   // TODO: This is somewhat a hack, can be done better
@@ -71,14 +58,14 @@ class Accounts extends LitElement {
     }
   }
 
-  getBalance(IBAN) {
+  getBalance(element, thisBalance) {
     var x = new XMLHttpRequest();
-    var accountElement = this.getAccount(IBAN);
-    console.log("getAccount", accountElement);
-    x.open("GET", "http://localhost:8080/getbalance?bankAccountNr=" + IBAN);
+    x.open("GET", "http://localhost:8080/getbalance?bankAccountNr=" + element.IBAN);
     x.onload = function() {
       if (x.status >= 200 && x.status < 400) {
-        balance = JSON.parse(x.responseText);
+        var bankAccount = JSON.parse(x.responseText);
+        thisBalance = bankAccount.balance;
+        return thisBalance;
       }
     };
     x.send();
@@ -87,14 +74,24 @@ class Accounts extends LitElement {
   sendTransaction() {
     var x = new XMLHttpRequest();
     x.open(
-      "GET",
-      "http://localhost:8080/getbalance?bankAccountNr=" + account.IBAN
+      "POST",
+      "http://localhost:8080/transaction",
+      true
     );
-    var jsonResponse;
-    x.onload = function(e) {
-      jsonResponse = JSON.parse(x.responseText);
-    };
-    x.send();
+    x.setRequestHeader("Content-type", "application/json");
+    console.log('values are: ', account.IBAN, this.toAccount, this.toAmount);
+    var transaction =
+    {
+        "fromBankAccount": 
+        {
+          "bankAccountNr": account.IBAN
+        },
+        "toBankAccount": {
+          "bankAccountNr": this.toAccount //"NL67INGB0001359336"
+        },
+       "amount": this.toAmount,
+   }
+    x.send(JSON.stringify(transaction));
   }
 
   render() {
@@ -113,10 +110,9 @@ class Accounts extends LitElement {
                 </div>
                 <div
                   class="balance"
-                  @value=${account.balance}
-                  @change=${this.getBalance(account.IBAN)}
+                  @value=${this.getBalance(account, this.balance)}
                 >
-                  &euro;${account.balance}
+                  &euro;${this.balance}
                 </div>
               </div>
               <div class="transaction">

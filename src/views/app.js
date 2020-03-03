@@ -1,4 +1,5 @@
 import { LitElement, css, html } from "lit-element";
+import { styleApp } from "./styleApp";
 
 const account = {
   IBAN: "NL78INGB7209131833",
@@ -7,64 +8,7 @@ const account = {
 
 class Accounts extends LitElement {
   static get styles() {
-    return css`
-      .my-accounts {
-        display: flex;
-        margin: 45px 0 0 0;
-      }
-
-      .my-accounts .title {
-        margin: 0 20px 0 0;
-      }
-
-      .my-accounts .accounts-content {
-        flex: auto;
-      }
-
-      .account {
-        cursor: pointer;
-        border: 1px solid #cccccc;
-        margin: 1px 0;
-        padding: 20px;
-      }
-
-      .account .account-row {
-        align-items: center;
-        display: flex;
-        justify-content: space-between;
-      }
-
-      .account .account-row > * {
-        pointer-events: none;
-      }
-
-      .account .account-row .IBAN {
-        font-size: 28px;
-      }
-
-      .account .account-row .balance {
-        font-size: 38px;
-      }
-
-      .account .transaction {
-        display: none;
-      }
-
-      .account .transaction {
-        border: 1px solid #cccccc;
-        padding: 15px;
-      }
-
-      .account.is-selected .transaction {
-        display: block;
-      }
-
-      .transaction-row {
-        border: 1px solid #cccccc;
-        margin: 1px 0;
-        padding: 20px;
-      }
-    `;
+    return styleApp;
   }
 
   static get properties() {
@@ -130,17 +74,12 @@ class Accounts extends LitElement {
   getBalance(IBAN) {
     var x = new XMLHttpRequest();
     var accountElement = this.getAccount(IBAN);
-    console.log('getAccount', accountElement);
-    x.open(
-      "GET",
-      "http://localhost:8080/getbalance?bankAccountNr="+IBAN
-    );
+    console.log("getAccount", accountElement);
+    x.open("GET", "http://localhost:8080/getbalance?bankAccountNr=" + IBAN);
     x.onload = function() {
       if (x.status >= 200 && x.status < 400) {
         balance = JSON.parse(x.responseText);
-        
       }
-
     };
     x.send();
   }
@@ -149,7 +88,7 @@ class Accounts extends LitElement {
     var x = new XMLHttpRequest();
     x.open(
       "GET",
-      "http://localhost:8080/getbalance?bankAccountNr="+account.IBAN
+      "http://localhost:8080/getbalance?bankAccountNr=" + account.IBAN
     );
     var jsonResponse;
     x.onload = function(e) {
@@ -167,23 +106,27 @@ class Accounts extends LitElement {
         <div class="accounts-content">
           ${this.accounts.map(
             account => html`
-              <div class="account" @click="${this.setSelected}">
-                <div class="account-row">
-                  <div class="IBAN">
-                    ${account.IBAN}
-                  </div>
-                  <div class="balance" @value=${account.balance} @change=${this.getBalance(account.IBAN)} >
-                    &euro;${account.balance}
-                  </div>
+            <div class="account" @click="${this.setSelected}">
+              <div class="account-row">
+                <div class="IBAN">
+                  ${account.IBAN}
                 </div>
-                <div class="transaction">
-                  <div class="transaction-row">
-                    Show all previous transactions for this bankaccount
-                    <!-- TO DO: alle vorige transacties -->
-                  </div>
+                <div
+                  class="balance"
+                  @value=${account.balance}
+                  @change=${this.getBalance(account.IBAN)}
+                >
+                  &euro;${account.balance}
                 </div>
               </div>
-            `
+              <div class="transaction">
+                <div class="transaction-row">
+                  Show all previous transactions for this bankaccount
+                  <!-- TO DO: alle vorige transacties -->
+                </div>
+              </div>
+            </div>
+          `
           )}
           <div class="transaction-row">
             Send &euro;

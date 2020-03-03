@@ -1,0 +1,38 @@
+*,
+html {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #f3f4f4;
+  color: #212121;
+  font-family: Arial, sans-serif;
+  font-size: 18px;
+}
+
+h1 {
+  color: #9b004c;
+  font-size: 28px;
+  font-weight: normal;
+}
+
+.wrapper {
+  background: #ffffff;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+  margin: 0 auto;
+  width: 980px;
+}
+
+.wrapper>* {
+  padding: 15px;
+}
+
+.content h1 {
+  text-align: center;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+}

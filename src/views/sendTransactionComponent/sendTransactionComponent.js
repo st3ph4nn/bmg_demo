@@ -4,7 +4,7 @@ class sendTransactionComponent extends LitElement {
 
   static get properties() {
     return {
-      accounts: { type: Array },
+      accountNr: String,
       toAccount: String,
       toAmount: Number,
     };
@@ -12,7 +12,7 @@ class sendTransactionComponent extends LitElement {
 
   constructor() {
     super();
-    this.accounts = [];
+    this.accountNr = "";
     this.toAccount = "";
     this.toAmount = 0;
   }
@@ -33,12 +33,11 @@ class sendTransactionComponent extends LitElement {
       true
     );
     x.setRequestHeader("Content-type", "application/json");
-    console.log('values are: ', account.IBAN, this.toAccount, this.toAmount);
     var transaction =
     {
         "fromBankAccount": 
         {
-          "bankAccountNr": this.accounts[0].IBAN
+          "bankAccountNr": this.accountNr
         },
         "toBankAccount": {
           "bankAccountNr": this.toAccount //"NL67INGB0001359336"
